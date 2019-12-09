@@ -45,7 +45,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetButton: {fileID: 3342162615334715911, guid: 8b389f6bec00a0142afc5a17c8d812c5,
     type: 3}
-  startSize: 1
+  startSize: {x: 25, y: 25}
   targetSize: 100
-  instFrequency: 0.5
   amountPerInst: 1
+  gameTimer: {fileID: 0}
+  easyFrequency: 1.5
+  mediumFrequency: 1
+  hardFrequency: 0.75
+  insaneFrequency: 0.25
+  timeLeftSeconds: 10

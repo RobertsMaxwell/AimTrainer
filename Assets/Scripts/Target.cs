@@ -3,71 +3,75 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Target : MonoBehaviour
+namespace Level1 
 {
-    [SerializeField] float timeBetweenChanges = .1f;
-    [SerializeField] float timeWhileLargeMin = .5f;
-    [SerializeField] float timeWhileLargeMax = 1f;
-
-    Vector2 startSize;
-
-    float fractionOfWhole = 0f;
-    bool growing = true;
-    bool canRun = true;
-
-    void Awake()
+    public class Target : MonoBehaviour
     {
-        startSize = gameObject.GetComponent<RectTransform>().sizeDelta;
-    }
+        [SerializeField] float timeBetweenChanges = .1f;
+        [SerializeField] float timeWhileLargeMin = .5f;
+        [SerializeField] float timeWhileLargeMax = 1f;
 
-    void Update()
-    {
-        if (Input.GetMouseButtonDown(0) && GetComponent<CircleCollider2D>().OverlapPoint(Input.mousePosition))
+        public Vector2 startSize;
+
+        float fractionOfWhole = 0f;
+        bool growing = true;
+        public bool canRun = true;
+
+        void Awake()
         {
-            Remove();
+            startSize = FindObjectOfType<Core>().startSize;
         }
-    }
 
-    public void Remove()
-    {
-        canRun = false;
-        Destroy(gameObject);
-    }
-
-    public IEnumerator Grow(float desiredSize)
-    {
-        fractionOfWhole = startSize.x / desiredSize;
-        while (canRun)
+        void Update()
         {
-            if (growing)
+            if (Input.GetMouseButtonDown(0) && GetComponent<CircleCollider2D>().OverlapPoint(Input.mousePosition))
             {
-                fractionOfWhole += Time.deltaTime;
-                gameObject.GetComponent<RectTransform>().sizeDelta = Vector2.Lerp(new Vector2(1, 1), new Vector2(desiredSize, desiredSize), fractionOfWhole);
-                gameObject.GetComponent<CircleCollider2D>().radius = GetComponent<RectTransform>().sizeDelta.x / 2;
-                yield return new WaitForSeconds(timeBetweenChanges);
-
-                if (fractionOfWhole >= 1) 
-                {
-                    growing = false;
-                    yield return new WaitForSeconds(Random.Range(timeWhileLargeMin, timeWhileLargeMax));
-                }
+                Remove();
             }
-            else
-            {
-                fractionOfWhole -= Time.deltaTime;
-                gameObject.GetComponent<RectTransform>().sizeDelta = Vector2.Lerp(new Vector2(1, 1), new Vector2(desiredSize, desiredSize), fractionOfWhole);
-                gameObject.GetComponent<CircleCollider2D>().radius = GetComponent<RectTransform>().sizeDelta.x / 2;
+        }
 
-                if (fractionOfWhole <= 0)
+        public void Remove()
+        {
+            canRun = false;
+            Destroy(gameObject);
+        }
+
+        public IEnumerator Grow(float desiredSize)
+        {
+            fractionOfWhole = startSize.x / desiredSize;
+            while (canRun)
+            {
+                if (growing)
                 {
-                    Remove();
-                    yield break;
+                    fractionOfWhole += Time.deltaTime;
+                    gameObject.GetComponent<RectTransform>().sizeDelta = Vector2.Lerp(new Vector2(1, 1), new Vector2(desiredSize, desiredSize), fractionOfWhole);
+                    gameObject.GetComponent<CircleCollider2D>().radius = GetComponent<RectTransform>().sizeDelta.x / 2;
+                    yield return new WaitForSeconds(timeBetweenChanges);
+
+                    if (fractionOfWhole >= 1)
+                    {
+                        growing = false;
+                        yield return new WaitForSeconds(Random.Range(timeWhileLargeMin, timeWhileLargeMax));
+                    }
                 }
                 else
                 {
-                    yield return new WaitForSeconds(timeBetweenChanges);
+                    fractionOfWhole -= Time.deltaTime;
+                    gameObject.GetComponent<RectTransform>().sizeDelta = Vector2.Lerp(new Vector2(1, 1), new Vector2(desiredSize, desiredSize), fractionOfWhole);
+                    gameObject.GetComponent<CircleCollider2D>().radius = GetComponent<RectTransform>().sizeDelta.x / 2;
+
+                    if (fractionOfWhole <= 0)
+                    {
+                        Remove();
+                        yield break;
+                    }
+                    else
+                    {
+                        yield return new WaitForSeconds(timeBetweenChanges);
+                    }
                 }
             }
         }
     }
 }
+
