@@ -9,12 +9,32 @@ public class SceneChanger : MonoBehaviour
 {
     public void ChangeScene(string sceneName)
     {
-        DontDestroyOnLoad(FindObjectOfType<Settings>());
-        SceneManager.LoadScene(sceneName);
-
-        if (FindObjectsOfType<Settings>().Length > 1)
+        if (SceneManager.GetActiveScene().name == "Start")
         {
-            Destroy(FindObjectOfType<Settings>());
+            DontDestroyOnLoad(FindObjectOfType<Settings>());
         }
+        else if (SceneManager.GetActiveScene().name == "Game")
+        {
+            DontDestroyOnLoad(FindObjectOfType<Core>());
+        }
+        else if (SceneManager.GetActiveScene().name == "Stats")
+        {
+            foreach (Core core in FindObjectsOfType<Core>())
+            {
+                Destroy(core.gameObject);
+            }
+
+            foreach (Settings settings in FindObjectsOfType<Settings>())
+            {
+                Destroy(settings.gameObject);
+            }
+        }
+
+        SceneManager.LoadScene(sceneName);
+    }
+
+    public void ExitGame()
+    {
+        Application.Quit();
     }
 }

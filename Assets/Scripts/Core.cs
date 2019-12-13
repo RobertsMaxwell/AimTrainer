@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using Game;
 
-namespace Level1
+namespace Game
 {
     public class Core : MonoBehaviour
     {
@@ -13,74 +12,119 @@ namespace Level1
         [SerializeField] public Vector2 startSize = new Vector2(1, 1);
         [SerializeField] float targetSize = 50;
         [SerializeField] int amountPerInst = 2;
-        [SerializeField] GameObject gameTimer;
+        [SerializeField] GameObject gameTimerWhole = null;
+        [SerializeField] GameObject gameTimerFloat = null;
 
         [Header("Instantiation Frequency")]
         [SerializeField] float easyFrequency = 1.5f;
         [SerializeField] float mediumFrequency = 1.0f;
         [SerializeField] float hardFrequency = .75f;
         [SerializeField] float insaneFrequency = .25f;
-        [SerializeField] float timeLeftSeconds = 10f;
+        [SerializeField] float gameTimeLeftSeconds = 10f;
 
+        public List<Vector2> posList = new List<Vector2>();
         Settings settings = null;
+        SceneChanger sceneChanger = null;
+
+        public float score = 0;
+        public float clicks = 0;
+        public float targetsSpawned = 0;
 
         Vector2 canvasOffset;
         Canvas canvas;
         float timeLeftUntilInst = 0;
         float instFrequency = 1f;
+        bool mouseHasBeenUp = true;
+        bool gameActive = true;
 
 
         // Start is called before the first frame update
         void Start()
         {
-            settings = FindObjectOfType<Settings>();
-            canvas = FindObjectOfType<Canvas>();
-            canvasOffset = canvas.GetComponent<RectTransform>().position;
-
-            if (settings != null)
+            if(gameActive)
             {
-                targetSize = (int)settings.targetSize;
+                settings = FindObjectOfType<Settings>();
+                canvas = FindObjectOfType<Canvas>();
+                canvasOffset = canvas.GetComponent<RectTransform>().position;
+                sceneChanger = FindObjectOfType<SceneChanger>();
 
-                switch (settings.difficulty)
+                if (settings != null)
                 {
-                    case Settings.Difficulty.Easy:
-                        instFrequency = easyFrequency;
-                        break;
-                    case Settings.Difficulty.Medium:
-                        instFrequency = mediumFrequency;
-                        break;
-                    case Settings.Difficulty.Hard:
-                        instFrequency = hardFrequency;
-                        break;
-                    case Settings.Difficulty.Insane:
-                        instFrequency = insaneFrequency;
-                        break;
-                    default:
-                        instFrequency = 1f;
-                        break;
+                    targetSize = (int)settings.targetSize;
+                    gameTimeLeftSeconds = (int)settings.duration;
+
+                    switch (settings.difficulty)
+                    {
+                        case Settings.Difficulty.Easy:
+                            instFrequency = easyFrequency;
+                            break;
+                        case Settings.Difficulty.Medium:
+                            instFrequency = mediumFrequency;
+                            break;
+                        case Settings.Difficulty.Hard:
+                            instFrequency = hardFrequency;
+                            break;
+                        case Settings.Difficulty.Insane:
+                            instFrequency = insaneFrequency;
+                            break;
+                        default:
+                            instFrequency = 1f;
+                            break;
+                    }
                 }
             }
         }
 
         void Update()
         {
-            if (timeLeftSeconds > 0)
+            if(gameActive)
             {
-                if (timeLeftUntilInst - Time.deltaTime <= 0)
+                if (gameTimeLeftSeconds > 0)
                 {
-                    timeLeftUntilInst = instFrequency;
-                    InstantiateCircle(startSize, targetSize, amountPerInst);
+                    if (timeLeftUntilInst - Time.deltaTime <= 0)
+                    {
+                        timeLeftUntilInst = instFrequency;
+                        InstantiateCircle(startSize, targetSize, amountPerInst);
+                    }
+                    else
+                    {
+                        timeLeftUntilInst -= Time.deltaTime;
+                    }
+
+                    gameTimeLeftSeconds -= Time.deltaTime;
+                    UpdateGameTimer(gameTimeLeftSeconds);
                 }
                 else
                 {
-                    timeLeftUntilInst -= Time.deltaTime;
+                    UpdateGameTimer(0);
+                    StopGame();
                 }
 
-                timeLeftSeconds -= Time.deltaTime;
-                UpdateGameTimer(timeLeftSeconds);
-            } else
-            {
-                StopGame();
+                bool foundTarget = false;
+                if (Input.GetKeyDown(KeyCode.Mouse0) && mouseHasBeenUp)
+                {
+                    foreach (Target target in FindObjectsOfType<Target>())
+                    {
+                        if (target.ClickedOn(Input.mousePosition))
+                        {
+                            foundTarget = true;
+                            target.Remove();
+                            UpdateStats(1, 1);
+                            break;
+                        }
+                    }
+
+                    if (!foundTarget)
+                    {
+                        UpdateStats(0, 1);
+                    }
+
+                    mouseHasBeenUp = false;
+                }
+                else if (Input.GetKeyUp(KeyCode.Mouse0))
+                {
+                    mouseHasBeenUp = true;
+                }
             }
         }
 
@@ -109,6 +153,9 @@ namespace Level1
                     instTarget.transform.SetParent(canvas.transform);
                     instTarget.GetComponent<RectTransform>().position = position;
                     StartCoroutine(instTarget.GetComponent<Target>().Grow(desiredSize));
+
+                    targetsSpawned++;
+                    posList.Add(position);
                 }
                 else
                 {
@@ -124,11 +171,29 @@ namespace Level1
                 target.canRun = false;
                 Destroy(target.gameObject);
             }
+            gameActive = false;
+            sceneChanger.ChangeScene("Stats");
         }
 
         void UpdateGameTimer(float time)
         {
-            gameTimer.GetComponent<TextMeshProUGUI>().text = Mathf.Ceil(time).ToString();
+            if (gameTimerWhole && gameTimerFloat && Mathf.Sign(time) == 1)
+            {
+                TextMeshProUGUI wholeObject = gameTimerWhole.GetComponent<TextMeshProUGUI>();
+                TextMeshProUGUI floatObject = gameTimerFloat.GetComponent<TextMeshProUGUI>();
+
+                wholeObject.text = Mathf.Floor(time).ToString();
+
+                if ((time - Mathf.Floor(time)).ToString().Length >= 4) floatObject.text = '.' + (time - Mathf.Floor(time)).ToString().Substring(2, 2);
+                else if ((time - Mathf.Floor(time)).ToString().Length == 3) floatObject.text = '.' + (time - Mathf.Floor(time)).ToString().Substring(2, 1);
+                else floatObject.text = ".00";
+            }
+        }
+
+        public void UpdateStats(int deltaScore, int deltaClicks)
+        {
+            score += deltaScore;
+            clicks += deltaClicks;
         }
     }
 }

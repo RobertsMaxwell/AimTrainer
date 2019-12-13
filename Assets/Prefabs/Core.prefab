@@ -48,7 +48,8 @@ MonoBehaviour:
   startSize: {x: 25, y: 25}
   targetSize: 100
   amountPerInst: 1
-  gameTimer: {fileID: 0}
+  gameTimerWhole: {fileID: 0}
+  gameTimerFloat: {fileID: 0}
   easyFrequency: 1.5
   mediumFrequency: 1
   hardFrequency: 0.75

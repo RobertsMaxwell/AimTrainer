@@ -19,22 +19,43 @@ namespace Game
 
         public enum TargetSize
         {
-            Small = 30,
-            Medium = 75,
-            Large = 125
+            Small = 50,
+            Medium = 100,
+            Large = 150
+        }
+
+        public enum Duration
+        { 
+            Quick = 15,
+            Normal = 30,
+            Long = 90
         }
 
         [SerializeField] GameObject difficultyButton = null;
         [SerializeField] GameObject sizeButton = null;
+        [SerializeField] GameObject durationButton = null;
 
         public Difficulty difficulty;
         public TargetSize targetSize;
+        public Duration duration;
 
         void Start()
         {
-            difficulty = Difficulty.Easy;
-            targetSize = TargetSize.Medium;
+            ButtonSetup();
         }
+
+        private void ButtonSetup()
+        {
+            difficulty = Difficulty.Medium;
+            difficultyButton.GetComponentInChildren<Text>().text = difficulty.ToString();
+
+            targetSize = TargetSize.Medium;
+            sizeButton.GetComponentInChildren<Text>().text = targetSize.ToString();
+
+            duration = Duration.Normal;
+            durationButton.GetComponentInChildren<Text>().text = duration.ToString();
+        }
+
         public void ChangeDifficulty()
         {
             if (difficultyButton != null)
@@ -56,6 +77,18 @@ namespace Game
 
                 targetSize = sizeList[(sizeList.IndexOf(targetSize) + 1) % sizeList.Count];
                 sizeButton.GetComponentInChildren<Text>().text = targetSize.ToString();
+            }
+        }
+
+        public void ChangeDuration()
+        {
+            if (difficultyButton != null)
+            {
+                List<Duration> durationList = new List<Duration>();
+                durationList = Enum.GetValues(typeof(Duration)).Cast<Duration>().ToList();
+
+                duration = durationList[(durationList.IndexOf(duration) + 1) % durationList.Count];
+                durationButton.GetComponentInChildren<Text>().text = duration.ToString();
             }
         }
     }
