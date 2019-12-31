@@ -50,8 +50,15 @@ MonoBehaviour:
   amountPerInst: 1
   gameTimerWhole: {fileID: 0}
   gameTimerFloat: {fileID: 0}
-  easyFrequency: 1.5
-  mediumFrequency: 1
-  hardFrequency: 0.75
-  insaneFrequency: 0.25
-  timeLeftSeconds: 10
+  madeClickObject: {fileID: 0}
+  missedClickObject: {fileID: 0}
+  easyFrequency: 0
+  mediumFrequency: 0.6
+  hardFrequency: 0.4
+  insaneFrequency: 0.2
+  gameTimeLeftSeconds: 10
+  instantiationTimeLeftSeconds: 9
+  posList: []
+  score: 0
+  clicks: 0
+  targetsSpawned: 0

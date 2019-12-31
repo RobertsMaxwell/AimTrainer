@@ -10,8 +10,6 @@ namespace Game
         [SerializeField] float timeBetweenChanges = .1f;
         [SerializeField] float timeWhileLargeMin = .5f;
         [SerializeField] float timeWhileLargeMax = 1f;
-        [SerializeField] float timeWhileSmallMin = .3f;
-        [SerializeField] float timeWhileSmallMax = .8f;
         [SerializeField] float fractionUntilSlowGrow = .75f;
         [SerializeField] float shrinkingSlowSize = 35f;
         [SerializeField] float shrinkingPauseSize = 30f;

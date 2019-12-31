@@ -14,13 +14,17 @@ namespace Game
         [SerializeField] int amountPerInst = 2;
         [SerializeField] GameObject gameTimerWhole = null;
         [SerializeField] GameObject gameTimerFloat = null;
+        [SerializeField] GameObject madeClickObject = null;
+        [SerializeField] GameObject missedClickObject = null;
 
         [Header("Instantiation Frequency")]
-        [SerializeField] float easyFrequency = 1.5f;
-        [SerializeField] float mediumFrequency = 1.0f;
-        [SerializeField] float hardFrequency = .75f;
-        [SerializeField] float insaneFrequency = .25f;
+        [SerializeField] float easyFrequency = .8f;
+        [SerializeField] float mediumFrequency = .6f;
+        [SerializeField] float hardFrequency = .4f;
+        [SerializeField] float insaneFrequency = .2f;
         [SerializeField] float gameTimeLeftSeconds = 10f;
+        [SerializeField] float instantiationTimeLeftSeconds = 9f;
+        [SerializeField] float instantiationFreeTime = 1.5f;
 
         public List<Vector2> posList = new List<Vector2>();
         Settings settings = null;
@@ -37,7 +41,6 @@ namespace Game
         bool mouseHasBeenUp = true;
         bool gameActive = true;
 
-
         // Start is called before the first frame update
         void Start()
         {
@@ -52,6 +55,7 @@ namespace Game
                 {
                     targetSize = (int)settings.targetSize;
                     gameTimeLeftSeconds = (int)settings.duration;
+                    instantiationTimeLeftSeconds = gameTimeLeftSeconds - instantiationFreeTime;
 
                     switch (settings.difficulty)
                     {
@@ -68,7 +72,7 @@ namespace Game
                             instFrequency = insaneFrequency;
                             break;
                         default:
-                            instFrequency = 1f;
+                            instFrequency = mediumFrequency;
                             break;
                     }
                 }
@@ -81,16 +85,20 @@ namespace Game
             {
                 if (gameTimeLeftSeconds > 0)
                 {
-                    if (timeLeftUntilInst - Time.deltaTime <= 0)
+                    if (instantiationTimeLeftSeconds > 0)
                     {
-                        timeLeftUntilInst = instFrequency;
-                        InstantiateCircle(startSize, targetSize, amountPerInst);
+                        if (timeLeftUntilInst - Time.deltaTime <= 0)
+                        {
+                            timeLeftUntilInst = instFrequency;
+                            InstantiateCircle(startSize, targetSize, amountPerInst);
+                        }
+                        else
+                        {
+                            timeLeftUntilInst -= Time.deltaTime;
+                        }
+                        instantiationTimeLeftSeconds -= Time.deltaTime;
                     }
-                    else
-                    {
-                        timeLeftUntilInst -= Time.deltaTime;
-                    }
-
+                    
                     gameTimeLeftSeconds -= Time.deltaTime;
                     UpdateGameTimer(gameTimeLeftSeconds);
                 }
@@ -107,6 +115,7 @@ namespace Game
                     {
                         if (target.ClickedOn(Input.mousePosition))
                         {
+                            Instantiate(madeClickObject, Input.mousePosition, Quaternion.identity, canvas.transform);
                             foundTarget = true;
                             target.Remove();
                             UpdateStats(1, 1);
@@ -116,6 +125,7 @@ namespace Game
 
                     if (!foundTarget)
                     {
+                        Instantiate(missedClickObject, Input.mousePosition, Quaternion.identity, canvas.transform);
                         UpdateStats(0, 1);
                     }
 

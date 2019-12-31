@@ -7,21 +7,21 @@ using Game;
 public class Statistics : MonoBehaviour
 {
     [Header("Accuracy")]
-    [SerializeField] Text accuracyLeftText;
-    [SerializeField] Text accuracyRightText;
+    [SerializeField] Text accuracyLeftText = null;
+    [SerializeField] Text accuracyRightText = null;
 
     [Header("Targets")]
-    [SerializeField] Text targetsLeftText;
-    [SerializeField] Text targetsRightText;
+    [SerializeField] Text targetsLeftText = null;
+    [SerializeField] Text targetsRightText = null;
 
     [Header("Game")]
-    [SerializeField] Text difficultyText;
-    [SerializeField] Text durationText;
-    [SerializeField] Text sizeText;
+    [SerializeField] Text difficultyText = null;
+    [SerializeField] Text durationText = null;
+    [SerializeField] Text sizeText = null;
 
     [Header("ClickMap")]
-    [SerializeField] GameObject miniCanvas;
-    [SerializeField] GameObject miniTarget;
+    [SerializeField] GameObject miniCanvas = null;
+    [SerializeField] GameObject miniTarget = null;
 
     Settings settings;
     Core core;
@@ -49,9 +49,9 @@ public class Statistics : MonoBehaviour
         targetsLeftText.text = $"{core.targetsSpawned}";
         targetsRightText.text = $"{core.score} Destroyed\n{core.targetsSpawned - core.score} Expired";
 
-        difficultyText.text = difficulty.ToString();
-        durationText.text = $"{duration} Seconds";
-        sizeText.text = targetSize.ToString();
+        difficultyText.text = $"Difficulty: \n{difficulty.ToString()}";
+        durationText.text = $"Duration: \n{(int)duration} Seconds";
+        sizeText.text = $"Size: \n {targetSize.ToString()}";
 
         foreach (Vector2 pos in core.posList)
         {

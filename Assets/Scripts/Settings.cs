@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 namespace Game
 {
@@ -26,14 +27,20 @@ namespace Game
 
         public enum Duration
         { 
-            Quick = 15,
-            Normal = 30,
-            Long = 90
+            Quick = 8,
+            Normal = 15,
+            Long = 30
         }
 
-        [SerializeField] GameObject difficultyButton = null;
-        [SerializeField] GameObject sizeButton = null;
-        [SerializeField] GameObject durationButton = null;
+        [SerializeField] GameObject difficultyButtonPos = null;
+        [SerializeField] GameObject difficultyButtonNeg = null;
+        [SerializeField] GameObject difficultyText = null;
+        [SerializeField] GameObject sizeButtonPos = null;
+        [SerializeField] GameObject sizeButtonNeg = null;
+        [SerializeField] GameObject sizeText = null;
+        [SerializeField] GameObject durationButtonPos = null;
+        [SerializeField] GameObject durationButtonNeg = null;
+        [SerializeField] GameObject durationText = null;
 
         public Difficulty difficulty;
         public TargetSize targetSize;
@@ -47,48 +54,48 @@ namespace Game
         private void ButtonSetup()
         {
             difficulty = Difficulty.Medium;
-            difficultyButton.GetComponentInChildren<Text>().text = difficulty.ToString();
+            difficultyText.GetComponent<TextMeshProUGUI>().text = difficulty.ToString();
 
             targetSize = TargetSize.Medium;
-            sizeButton.GetComponentInChildren<Text>().text = targetSize.ToString();
+            sizeText.GetComponent<TextMeshProUGUI>().text = targetSize.ToString();
 
             duration = Duration.Normal;
-            durationButton.GetComponentInChildren<Text>().text = duration.ToString();
+            durationText.GetComponent<TextMeshProUGUI>().text = duration.ToString();
         }
 
-        public void ChangeDifficulty()
+        public void ChangeDifficulty(int change)
         {
-            if (difficultyButton != null)
+            if (difficultyButtonPos && difficultyButtonNeg)
             {
-                List<Difficulty> difficultyList = new List<Difficulty>();
+                List<Difficulty> difficultyList;
                 difficultyList = Enum.GetValues(typeof(Difficulty)).Cast<Difficulty>().ToList();
 
-                difficulty = difficultyList[(difficultyList.IndexOf(difficulty) + 1) % difficultyList.Count];
-                difficultyButton.GetComponentInChildren<Text>().text = difficulty.ToString();
+                difficulty = difficultyList[(int)Mathf.Repeat(difficultyList.IndexOf(difficulty) + change, difficultyList.Count)];
+                difficultyText.GetComponent<TextMeshProUGUI>().text = difficulty.ToString();
             }
         }
 
-        public void ChangeSize()
+        public void ChangeSize(int change)
         {
-            if (sizeButton != null)
+            if (sizeButtonPos && sizeButtonNeg)
             {
-                List<TargetSize> sizeList = new List<TargetSize>();
+                List<TargetSize> sizeList;
                 sizeList = Enum.GetValues(typeof(TargetSize)).Cast<TargetSize>().ToList();
 
-                targetSize = sizeList[(sizeList.IndexOf(targetSize) + 1) % sizeList.Count];
-                sizeButton.GetComponentInChildren<Text>().text = targetSize.ToString();
+                targetSize = sizeList[(int)Mathf.Repeat(sizeList.IndexOf(targetSize) + change, sizeList.Count)];
+                sizeText.GetComponent<TextMeshProUGUI>().text = targetSize.ToString();
             }
         }
 
-        public void ChangeDuration()
+        public void ChangeDuration(int change)
         {
-            if (difficultyButton != null)
+            if (durationButtonPos && durationButtonNeg)
             {
-                List<Duration> durationList = new List<Duration>();
+                List<Duration> durationList;
                 durationList = Enum.GetValues(typeof(Duration)).Cast<Duration>().ToList();
 
-                duration = durationList[(durationList.IndexOf(duration) + 1) % durationList.Count];
-                durationButton.GetComponentInChildren<Text>().text = duration.ToString();
+                duration = durationList[(int)Mathf.Repeat(durationList.IndexOf(duration) + change, durationList.Count)];
+                durationText.GetComponent<TextMeshProUGUI>().text = duration.ToString();
             }
         }
     }
